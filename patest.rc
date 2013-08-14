@@ -1,37 +1,33 @@
-#[link(name = "rtlsdr", vers = "0.1", author = "Ian Daniher")];
+#[link(name = "pa-simple", vers = "0.1", author = "Ian Daniher")];
 
 extern mod extra;
 
 use extra::time;
 use extra::complex;
 
-mod kissfft;
+use std::iterator;
+use std::rand;
 
+mod kissfft;
+mod dsputils;
 mod video;
 mod pa;
 
 fn main() {
-	let (p1, c1) = kissfft::buildFFTBlock(256, true);
+	let (p1, c1) = kissfft::buildFFTBlock(256*8, true);
 	let (p2, c2) = video::spawnVectorVisualSink();
-	let pa = pa::buildPASourceBlock();
-	let mut i = 0;
-	let now = time::precise_time_ns();
-	let mut v: ~[u64] = ~[];
-	for 100.times {
-		let data: ~[f32] = pa.recv();
-		v.push((time::precise_time_ns() - now)/1000);
-		let samples: ~[complex::Complex32] = data.iter().transform(|&x| {complex::Cmplx {re: x, im: 0.0}}).collect();
-		v.push((time::precise_time_ns() - now)/1000);
-		c1.send(samples);
-		v.push((time::precise_time_ns() - now)/1000);
-		let fftd = p1.recv();
-		v.push((time::precise_time_ns() - now)/1000);
-		let mag: ~[f32] = fftd.iter().transform(|&x| {let (a,b) = x.to_polar(); a}).collect();
-		v.push((time::precise_time_ns() - now)/1000);
-		c2.send(mag);
-		v.push((time::precise_time_ns() - now)/1000);
+	let pi = pa::buildPASourceBlock(44100, 256*8);
+	let outNoise: ~[f32] = iterator::range(0, 128*256).transform(|x| 2f32*rand::random::<f32>() - 1f32 ).collect::<~[f32]>();
+	do spawn {
+		let po = pa::buildPASinkBlock(44100);
+		loop {
+			po.send(outNoise.clone());
+		}
 	}
-	let vf32: ~[f32] = v.iter().transform( |&x| (x as f32)/1000.0).collect();	
-	println(fmt!("%?", vf32));
-	c2.send(vf32);
+	loop {
+		c1.send(dsputils::asRe(pi.recv()));
+		let x: ~[f32] = dsputils::asF32(p1.recv());
+		let y: ~[f32] = x.iter().transform(|&x| x.abs()).collect();
+		c2.send(y.slice(0, 256*2).to_owned());
+	}
 }
