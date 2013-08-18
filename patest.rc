@@ -17,7 +17,7 @@ fn main() {
 	let (p1, c1) = kissfft::buildFFTBlock(256*8, true);
 	let (p2, c2) = video::spawnVectorVisualSink();
 	let pi = pa::buildPASourceBlock(44100, 256*8);
-	let outNoise: ~[f32] = iterator::range(0, 128*256).transform(|x| 2f32*rand::random::<f32>() - 1f32 ).collect::<~[f32]>();
+	let outNoise: ~[f32] = iterator::range(0, 128*256).map(|x| 2f32*rand::random::<f32>() - 1f32 ).collect::<~[f32]>();
 	do spawn {
 		let po = pa::buildPASinkBlock(44100);
 		loop {
@@ -27,7 +27,7 @@ fn main() {
 	loop {
 		c1.send(dsputils::asRe(pi.recv()));
 		let x: ~[f32] = dsputils::asF32(p1.recv());
-		let y: ~[f32] = x.iter().transform(|&x| x.abs()).collect();
+		let y: ~[f32] = x.iter().map(|&x| x.abs()).collect();
 		c2.send(y.slice(0, 256*2).to_owned());
 	}
 }
