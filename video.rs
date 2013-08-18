@@ -31,7 +31,8 @@ pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 			y: yf as i16,
 			w: (width) as u16,
 			h: hf as u16};
-		screen.fill_rect(Some(r), sdl::video::RGB(0,127,0)); });
+		screen.fill_rect(Some(r), sdl::video::RGB(0,127,0));
+	}).len();
 }
 
 fn doWorkWithPEs (pDataC: comm::Port<~[f32]>, cUserC: comm::Chan<sdl::event::Key>) {
