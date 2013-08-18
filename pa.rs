@@ -43,13 +43,13 @@ pub fn buildPASourceBlock(sRate: uint, bSize: uint) -> comm::Port<~[f32]> {
 	do task::spawn_sched(task::SingleThreaded) {
 		unsafe {
 			let error: c_int = 0;
-			let s: *pa_simple = pa_simple_new(null(), "rust-pa-simple-source".as_c_str(|x| x), 2, null(), "pa-source".as_c_str(|x| x), &ss, null(), null(), &error);
+			let s: *pa_simple = pa_simple_new(null(), "rust-pa-simple-source".to_c_str().unwrap(), 2, null(), "pa-source".to_c_str().unwrap(), &ss, null(), null(), &error);
 			assert_eq!(error, 0);
 			'main : loop {
 				let mut buffer: ~[i16] = vec::from_elem(bSize, 0i16);
 				pa_simple_read(s, cast::transmute(vec::raw::to_mut_ptr(buffer)), (bSize*2) as u64, &error);
 				assert_eq!(error, 0);
-				let f32Buffer: ~[f32] = buffer.iter().transform(|&i| (i as f32)).collect();
+				let f32Buffer: ~[f32] = buffer.iter().map(|&i| (i as f32)).collect();
 				cData.send(f32Buffer);
 			}
 		}
@@ -63,7 +63,7 @@ pub fn buildPASinkBlock(sRate: uint) -> comm::Chan<~[f32]> {
 	do task::spawn_sched(task::SingleThreaded) {
 		let error: c_int = 0;
 		unsafe {
-			let s: *pa_simple = pa_simple_new(null(), "rust-pa-simple-sink".as_c_str(|x| x), 1, null(), "pa-sink".as_c_str(|x| x), &ss, null(), null(), &error);
+			let s: *pa_simple = pa_simple_new(null(), "rust-pa-simple-sink".to_c_str().unwrap(), 1, null(), "pa-sink".to_c_str().unwrap(), &ss, null(), null(), &error);
 			println(fmt!("%?", pa_simple_get_latency(s, &error)));
 			'main : loop {
 				let samps: ~[f32] = pData.recv();
@@ -81,7 +81,7 @@ fn main() {
 	let freq = 5.0/(256.0/(sRate as float));
 	println(fmt!("%?", freq));
 	let z = ~[0, ..256];
-	let sin: ~[f32] = z.iter().enumerate().transform(|(x, &y)| {num::sin(((x as float)/(sRate as float))*freq*6.28319) as f32}).collect();
+	let sin: ~[f32] = z.iter().enumerate().map(|(x, &y)| {num::sin(((x as float)/(sRate as float))*freq*6.28319) as f32}).collect();
 	let c = buildPASinkBlock(sRate);
 	println(fmt!("%?", sin));
 	for x in range(0, 100) {

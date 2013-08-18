@@ -8,7 +8,7 @@ pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 	// downsample to 800px if needbe
 	let len: uint = data.len() as uint;
 	let px: uint = screen.get_width() as uint;
-	data = data.iter().enumerate().filter(|&(x, &y)| (x % (len/px + 1)) == 0).transform(|(x, &y)| y).collect();
+	data = data.iter().enumerate().filter(|&(x, &y)| (x % (len/px + 1)) == 0).map(|(x, &y)| y).collect();
 	// black screen background
 	screen.fill_rect(Some(sdl::Rect {x: 0 as i16, y: 0 as i16, w: screen.get_width(), h: screen.get_height()}), sdl::video::RGB(0,0,0));
 	// calculate bar width
@@ -21,7 +21,7 @@ pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 	let scale: f32 = height / (2f32*(dmax-dmin));
 	assert!(width > 1.0);
 	data.reverse();
-	data.iter().enumerate().transform(|(i, &x)| {
+	data.iter().enumerate().map(|(i, &x)| {
 		let mut yf = height*0.5f32;
 		let mut hf = scale*x;
 		if (x > 0f32) {yf -= x*scale;}
@@ -31,7 +31,7 @@ pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 			y: yf as i16,
 			w: (width) as u16,
 			h: hf as u16};
-		screen.fill_rect(Some(r), sdl::video::RGB(0,127,0)); }).last_();
+		screen.fill_rect(Some(r), sdl::video::RGB(0,127,0)); });
 }
 
 fn doWorkWithPEs (pDataC: comm::Port<~[f32]>, cUserC: comm::Chan<sdl::event::Key>) {
