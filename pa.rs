@@ -7,6 +7,7 @@ use std::comm;
 use std::task;
 use std::num;
 
+
 // opaque struct
 struct pa_simple;
 
@@ -16,8 +17,9 @@ struct pa_sample_spec {
 	channels: u8
 }
 
-#[link_args = "-lpulse -lpulse-simple"]
-extern {
+#[link_args = "-lpulse -lpulse-simple"] extern {}
+
+externfn!(
 	fn pa_simple_new(
 		server: *c_void,
 		name: *i8,
@@ -28,12 +30,17 @@ extern {
 		pa_channel_map: *c_void,
 		pa_buffer_attr: *c_void,
 		error: *c_int
-	) -> *pa_simple;
-	fn pa_simple_read(s: *pa_simple, data: *mut c_void, bytes: size_t, error: *c_int) -> c_int;
-	fn pa_simple_write(s: *pa_simple, data: *c_void, bytes: size_t, error: *c_int) -> c_int;
-	fn pa_simple_flush(s: *pa_simple, error: *c_int) -> c_int;
-	fn pa_simple_get_latency(s: *pa_simple, error: *c_int) -> u64;
-}
+	) -> *pa_simple
+)
+externfn!(
+	fn pa_simple_read(s: *pa_simple, data: *mut c_void, bytes: size_t, error: *c_int) -> c_int)
+externfn!(
+	fn pa_simple_write(s: *pa_simple, data: *c_void, bytes: size_t, error: *c_int) -> c_int)
+externfn!(
+	fn pa_simple_flush(s: *pa_simple, error: *c_int) -> c_int)
+externfn!(
+	fn pa_simple_get_latency(s: *pa_simple, error: *c_int) -> u64)
+
 
 pub fn buildPASourceBlock(sRate: uint, bSize: uint) -> comm::Port<~[f32]> {
 	let (pData, cData): (comm::Port<~[f32]>, comm::Chan<~[f32]>) = comm::stream();
