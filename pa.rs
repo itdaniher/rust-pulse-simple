@@ -1,5 +1,4 @@
 use std::libc::{c_int, c_void, size_t};
-use std::iterator;
 use std::ptr::null;
 use std::cast;
 use std::vec;

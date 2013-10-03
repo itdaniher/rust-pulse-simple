@@ -37,13 +37,12 @@ pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 }
 
 pub fn doWorkWithPEs (pDataC: comm::Port<~[f32]>) {
-	do sdl::start {
-		let mut lastDraw: u64 = 0;
-		sdl::init([sdl::InitVideo]);
-		sdl::wm::set_caption("rust-sdl", "rust-sdl");
-		let screen = match sdl::video::set_video_mode(1100, 400, 32, [sdl::video::HWSurface], [sdl::video::DoubleBuf]) {
-			Ok(screen) => screen,
-			Err(err) => fail!(fmt!("failed to set video mode: %s", err))
+	let mut lastDraw: u64 = 0;
+	sdl::init([sdl::InitVideo]);
+	sdl::wm::set_caption("rust-sdl", "rust-sdl");
+	let screen = match sdl::video::set_video_mode(1100, 400, 32, [sdl::video::HWSurface], [sdl::video::DoubleBuf]) {
+		Ok(screen) => screen,
+		Err(err) => fail!(fmt!("failed to set video mode: %s", err))
 		};
 		'main : loop {
 			if pDataC.peek() {
@@ -60,12 +59,11 @@ pub fn doWorkWithPEs (pDataC: comm::Port<~[f32]>) {
 				}
 			}
 			if ((time::precise_time_ns() - lastDraw) > ((1f/30f)*1e9) as u64) {
-				lastDraw = time::precise_time_ns();
-				screen.flip();
-			}
+			lastDraw = time::precise_time_ns();
+			screen.flip();
 		}
-		sdl::quit();
 	}
+	sdl::quit();
 }
 
 pub fn spawnVectorVisualSink() -> (comm::Port<sdl::event::Key>, comm::Chan<~[f32]>){
