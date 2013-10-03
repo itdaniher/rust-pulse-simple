@@ -1,1 +1,2 @@
-some pulseaudio tinkering
+'rustpkg install spectrumplot' and run ./bin/spectrumplot for demo.
+
