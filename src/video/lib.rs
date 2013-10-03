@@ -1,9 +1,9 @@
 extern mod sdl;
 extern mod extra;
+extern mod dsputils;
 use extra::time;
 use std::comm;
 use std::task;
-mod dsputils;
 
 pub fn drawVectorAsBarPlot (screen: &sdl::video::Surface, mut data: ~[f32]){
 	// downsample to 800px if needbe

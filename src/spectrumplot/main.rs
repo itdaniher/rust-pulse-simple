@@ -1,11 +1,8 @@
-#[link(name = "pa-simple", vers = "0.1", author = "Ian Daniher")];
 extern mod extra;
-
-mod kissfft;
-mod dsputils;
-mod video;
-mod pa;
-
+extern mod kissfft;
+extern mod dsputils;
+extern mod video;
+extern mod pa;
 
 fn main() {
 	let (p1, c1) = kissfft::buildFFTBlock(256*8, true);
