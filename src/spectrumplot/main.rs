@@ -1,12 +1,12 @@
 extern mod extra;
 extern mod kissfft;
 extern mod dsputils;
-extern mod video;
+extern mod videoSinkSDL1;
 extern mod pa;
 
 fn main() {
 	let (p1, c1) = kissfft::buildFFTBlock(256*8, true);
-	let (p2, c2) = video::spawnVectorVisualSink();
+	let (p2, c2) = videoSinkSDL1::spawnVectorVisualSink();
 	let pi = pa::buildPASourceBlock(44100, 256*8);
 	loop {
 		c1.send(dsputils::asRe(pi.recv()));
