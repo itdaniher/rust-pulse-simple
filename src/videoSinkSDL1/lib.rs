@@ -58,7 +58,7 @@ pub fn doWorkWithPEs (pDataC: comm::Port<~[f32]>) {
 					_ => {println(fmt!("%?", ev));}
 				}
 			}
-			if ((time::precise_time_ns() - lastDraw) > ((1f/30f)*1e9) as u64) {
+			if ((time::precise_time_ns() - lastDraw) > ((1f32/30f32)*1e9) as u64) {
 			lastDraw = time::precise_time_ns();
 			screen.flip();
 		}
